@@ -108,17 +108,23 @@ Bitstamp.prototype._generateNonce = function() {
       this.nonceIncr < 100 ? '00' :
         this.nonceIncr < 1000 ?  '0' : '';
   return now + padding + this.nonceIncr;
-}
+};
 
 Bitstamp.prototype._get = function(market, action, callback, args) {
   args = _.compactObject(args);
+  var path;
 
   if(market)
-    var path = '/api/v2/' + action + '/' + market;
-  else
+    path = '/api/v2/' + action + '/' + market;
+  else {
     // some documented endpoints (eg `https://www.bitstamp.net/api/eur_usd/`)
     // do not go via the v2 api.
-    var path = '/api/' + action;
+    if (args.v2) {
+      path = '/api/v2/' + action;
+    } else {
+      path = '/api/' + action;
+    }
+  }
 
   path += (querystring.stringify(args) === '' ? '/' : '/?') + querystring.stringify(args);
   this._request('get', path, undefined, callback, args)
@@ -189,7 +195,7 @@ Bitstamp.prototype.order_book = function(market, group, callback) {
 };
 
 Bitstamp.prototype.trading_pairs_info = function(callback) {
-  this._get(null, 'trading-pairs-info', callback);
+  this._get(null, 'trading-pairs-info', callback, {v2: true});
 };
 
 // This API calls are removed from the documentation as of `Sat Jun 11 2016 10:10:07`
