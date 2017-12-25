@@ -30,7 +30,7 @@ var Bitstamp = function(key, secret, client_id, timeout, host) {
   this.host = host || 'www.bitstamp.net';
 
   _.bindAll(this);
-}
+};
 
 Bitstamp.prototype._request = function(method, path, data, callback, args) {
   var timeout = this.timeout;
@@ -87,7 +87,7 @@ Bitstamp.prototype._request = function(method, path, data, callback, args) {
   });
 
   req.end(data);
-}
+};
 
 // if you call new Date too fast it will generate
 // the same ms, helper to make sure the nonce is
@@ -122,19 +122,20 @@ Bitstamp.prototype._get = function(market, action, callback, args) {
 
   path += (querystring.stringify(args) === '' ? '/' : '/?') + querystring.stringify(args);
   this._request('get', path, undefined, callback, args)
-}
+};
 
 Bitstamp.prototype._post = function(market, action, callback, args, legacy_endpoint) {
+  var path;
   if(!this.key || !this.secret || !this.client_id)
     return callback(new Error('Must provide key, secret and client ID to make this API request.'));
 
   if(legacy_endpoint)
-    var path = '/api/' + action + '/';
+    path = '/api/' + action + '/';
   else {
     if(market)
-      var path = '/api/v2/' + action + '/' + market + '/';
+      path = '/api/v2/' + action + '/' + market + '/';
     else
-      var path = '/api/v2/' + action + '/';
+      path = '/api/v2/' + action + '/';
   }
 
   var nonce = this._generateNonce();
@@ -164,15 +165,15 @@ Bitstamp.prototype.transactions = function(market, options, callback) {
     options = undefined;
   }
   this._get(market, 'transactions', callback, options);
-}
+};
 
 Bitstamp.prototype.ticker = function(market, callback) {
   this._get(market, 'ticker', callback);
-}
+};
 
 Bitstamp.prototype.ticker_hour = function(market, callback) {
   this._get(market, 'ticker_hour', callback);
-}
+};
 
 Bitstamp.prototype.order_book = function(market, group, callback) {
   if(!callback) {
@@ -185,7 +186,11 @@ Bitstamp.prototype.order_book = function(market, group, callback) {
   else
     options = {group: group};
   this._get(market, 'order_book', callback, options);
-}
+};
+
+Bitstamp.prototype.trading_pairs_info = function(callback) {
+  this._get(null, 'trading-pairs-info', callback);
+};
 
 // This API calls are removed from the documentation as of `Sat Jun 11 2016 10:10:07`
 // Bitstamp.prototype.bitinstant = function(callback) {
@@ -194,7 +199,7 @@ Bitstamp.prototype.order_book = function(market, group, callback) {
 
 Bitstamp.prototype.eur_usd = function(callback) {
   this._get(null, 'eur_usd', callback);
-}
+};
 
 //
 // Private API
@@ -203,7 +208,7 @@ Bitstamp.prototype.eur_usd = function(callback) {
 
 Bitstamp.prototype.balance = function(market, callback) {
   this._post(market, 'balance', callback);
-}
+};
 
 Bitstamp.prototype.user_transactions = function(market, options, callback) {
   if(!callback) {
@@ -211,11 +216,11 @@ Bitstamp.prototype.user_transactions = function(market, options, callback) {
     options = undefined;
   }
   this._post(market, 'user_transactions', callback, options);
-}
+};
 
 Bitstamp.prototype.open_orders = function(market, callback) {
   this._post(market, 'open_orders', callback);
-}
+};
 
 Bitstamp.prototype.order_status = function (id, callback) {
   this._post(null, 'order_status', callback, {id: id}, true);
@@ -223,11 +228,11 @@ Bitstamp.prototype.order_status = function (id, callback) {
 
 Bitstamp.prototype.cancel_order = function(id, callback) {
   this._post(null, 'cancel_order', callback, {id: id}, true);
-}
+};
 
 Bitstamp.prototype.cancel_all_orders = function(callback) {
   this._post(null, 'cancel_all_orders', callback, null, true);
-}
+};
 
 Bitstamp.prototype.buy = function(market, amount, price, limit_price, callback) {
   this._post(market, 'buy', callback, {
@@ -235,13 +240,13 @@ Bitstamp.prototype.buy = function(market, amount, price, limit_price, callback) 
     price: price,
     limit_price: limit_price
   });
-}
+};
 
 Bitstamp.prototype.buyMarket = function(market, amount, callback) {
   this._post(market, 'buy/market', callback, {
     amount: amount
   });
-}
+};
 
 Bitstamp.prototype.sell = function(market, amount, price, limit_price, callback) {
   this._post(market, 'sell', callback, {
@@ -249,17 +254,17 @@ Bitstamp.prototype.sell = function(market, amount, price, limit_price, callback)
     price: price,
     limit_price: limit_price
   });
-}
+};
 
 Bitstamp.prototype.sellMarket = function(market, amount, callback) {
   this._post(market, 'sell/market', callback, {
     amount: amount
   });
-}
+};
 
 Bitstamp.prototype.withdrawal_requests = function(callback) {
   this._post(null, 'withdrawal_requests', callback, null, true);
-}
+};
 
 Bitstamp.prototype.bitcoin_withdrawal = function(amount, address, instant, callback) {
   this._post(null, 'bitcoin_withdrawal', callback, {
@@ -267,7 +272,7 @@ Bitstamp.prototype.bitcoin_withdrawal = function(amount, address, instant, callb
     address: address,
     instant: instant
   }, true);
-}
+};
 
 Bitstamp.prototype.xrp_withdrawal = function(amount, address, destination_tag, callback) {
   this._post(null, 'xrp_withdrawal', callback, {
@@ -275,15 +280,15 @@ Bitstamp.prototype.xrp_withdrawal = function(amount, address, destination_tag, c
     address: address,
     destination_tag: destination_tag
   }, true);
-}
+};
 
 Bitstamp.prototype.bitcoin_deposit_address = function(callback) {
   this._post(null, 'bitcoin_deposit_address', callback, null, true);
-}
+};
 
 Bitstamp.prototype.unconfirmed_btc = function(callback) {
   this._post(null, 'unconfirmed_btc', callback, null, true);
-}
+};
 
 
 // the API documentation is wrong as of `Sat Jun 11 2016 10:10:07`.
@@ -295,11 +300,11 @@ Bitstamp.prototype.ripple_withdrawal = function(amount, address, currency, callb
     address: address,
     currency: currency
   }, true);
-}
+};
 
 Bitstamp.prototype.ripple_address = function(callback) {
   this._post(null, 'ripple_address', callback, null, true);
-}
+};
 
 Bitstamp.prototype.transfer_to_main = function(amount, currency, subAccount, callback) {
   this._post(null, 'transfer-to-main', callback, {
@@ -307,7 +312,7 @@ Bitstamp.prototype.transfer_to_main = function(amount, currency, subAccount, cal
     currency: currency,
     subAccount: subAccount
   }, true);
-}
+};
 
 Bitstamp.prototype.transfer_from_main = function(amount, currency, subAccount, callback) {
   this._post(null, 'transfer-from-main', callback, {
@@ -315,6 +320,6 @@ Bitstamp.prototype.transfer_from_main = function(amount, currency, subAccount, c
     currency: currency,
     subAccount: subAccount
   }, true);
-}
+};
 
 module.exports = Bitstamp;
